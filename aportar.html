@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>oir a sor — aportar evidencia</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Bahnschrift', 'Arial Narrow', Arial, sans-serif;
+      background: #0a1628;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .wrap {
+      width: min(560px, 100%);
+    }
+
+    .back {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      margin-bottom: 32px;
+      transition: color 0.2s;
+    }
+    .back:hover {
+      color: #FF0000;
+    }
+
+    .tag {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #FF0000;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .notice {
+      border: 1px solid rgba(255,0,0,0.35);
+      background: rgba(255,0,0,0.06);
+      padding: 16px 18px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 36px;
+      letter-spacing: 0.02em;
+    }
+
+    .notice strong {
+      color: #FF0000;
+    }
+
+    .field {
+      margin-bottom: 22px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 8px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: #FF0000;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: rgba(255,255,255,0.2);
+    }
+
+    .field-file {
+      border: 1px dashed rgba(255,255,255,0.2);
+      padding: 28px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+    }
+    .field-file:hover {
+      border-color: #FF0000;
+      background: rgba(255,0,0,0.04);
+    }
+    .field-file input { display: none; }
+    .field-file.has-file {
+      color: #fff;
+      border-color: #FF0000;
+    }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 12px;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #000;
+      background: #FF0000;
+      border: none;
+      padding: 14px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+
+    .confirm {
+      display: none;
+      text-align: center;
+      padding: 60px 0;
+    }
+    .confirm.visible { display: block; }
+    .confirm .tag { margin-bottom: 16px; }
+    .confirm h2 {
+      font-size: 22px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .confirm p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+    }
+
+    form.hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <a class="back" href="mapa.html">← Volver al mapa</a>
+    <div class="tag" id="tagLabel">Aportar</div>
+    <h1 id="titleLabel">Cargar evidencia</h1>
+
+    <div class="notice">
+      <strong>Sor</strong> va a revisar tus evidencias antes de cargarlas públicamente.
+    </div>
+
+    <form id="aportarForm">
+      <div class="field">
+        <label>Túnel relacionado</label>
+        <input type="text" placeholder="ej: Túnel 04" id="tunel" />
+      </div>
+
+      <div class="field" id="campoArchivo">
+        <label>Archivo</label>
+        <label class="field-file" id="fileLabel" for="fileInput">
+          Click para subir foto o evidencia
+        </label>
+        <input type="file" id="fileInput" accept="image/*,.pdf" />
+      </div>
+
+      <div class="field" id="campoCoordenadas">
+        <label>Coordenadas</label>
+        <input type="text" placeholder='ej: 32° 56&quot; 9&apos; S  60° 39&quot; 41&apos; O' id="coords" />
+      </div>
+
+      <div class="field">
+        <label>Descripción</label>
+        <textarea placeholder="Contanos qué encontraste..." id="desc"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">Enviar a revisión</button>
+    </form>
+
+    <div class="confirm" id="confirmBox">
+      <div class="tag">Recibido</div>
+      <h2>Tu evidencia fue enviada</h2>
+      <p>Sor va a revisarla antes de publicarla en el mapa. Gracias por aportar a la investigación.</p>
+    </div>
+  </div>
+
+  <script>
+    // detectar tipo desde la URL para customizar el formulario
+    const params = new URLSearchParams(window.location.search);
+    const tipo = params.get('tipo') || 'evidencias';
+
+    const labels = {
+      foto: { tag: 'Aportar · Foto', title: 'Subir una foto' },
+      coordenadas: { tag: 'Aportar · Coordenadas', title: 'Aportar coordenadas' },
+      evidencias: { tag: 'Aportar · Evidencias', title: 'Cargar evidencia' }
+    };
+
+    document.getElementById('tagLabel').textContent = labels[tipo].tag;
+    document.getElementById('titleLabel').textContent = labels[tipo].title;
+
+    // mostrar/ocultar campos según el tipo
+    if (tipo === 'coordenadas') {
+      document.getElementById('campoArchivo').style.display = 'none';
+    } else if (tipo === 'foto') {
+      document.getElementById('campoCoordenadas').style.display = 'none';
+    }
+
+    const fileInput = document.getElementById('fileInput');
+    const fileLabel = document.getElementById('fileLabel');
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileLabel.textContent = fileInput.files[0].name;
+        fileLabel.classList.add('has-file');
+      }
+    });
+
+    document.getElementById('aportarForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      this.classList.add('hidden');
+      document.getElementById('confirmBox').classList.add('visible');
+    });
+  </script>
+
+</body>
+</html>

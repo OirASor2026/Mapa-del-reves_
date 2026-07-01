@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>oir a sor — rosario al revés</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --rojo: #FF0000;
+      --negro: #000000;
+      --blanco: #ffffff;
+      --gris-oscuro: #0a0a0a;
+    }
+
+    @font-face {
+      font-family: 'Bahnschrift';
+      src: local('Bahnschrift'), local('Franklin Gothic Medium');
+    }
+
+    body {
+      font-family: 'Bahnschrift', 'Arial Narrow', Arial, sans-serif;
+      background: var(--negro);
+      color: var(--blanco);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── LANDING ── */
+    .landing {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .bg {
+      position: absolute;
+      inset: 0;
+      background: url('bg.png') center center / cover no-repeat;
+      z-index: 0;
+    }
+
+    /* scanline overlay */
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.08) 3px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+    }
+
+    /* dark vignette */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%);
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo-img {
+      width: min(700px, 80vw);
+      height: auto;
+      display: block;
+    }
+
+    .btn-login {
+      font-family: 'Bahnschrift', 'Arial Narrow', Arial, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--rojo);
+      background: transparent;
+      border: 1.5px solid var(--rojo);
+      border-radius: 999px;
+      padding: 12px 40px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-login:hover {
+      background: var(--rojo);
+      color: var(--negro);
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: #0d0d0d;
+      border: 1px solid rgba(255,0,0,0.3);
+      width: min(420px, 90vw);
+      padding: 48px 40px 40px;
+      position: relative;
+      transform: translateY(16px);
+      transition: transform 0.3s;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      font-family: inherit;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--rojo);
+    }
+
+    .modal-tag {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--rojo);
+      margin-bottom: 8px;
+    }
+
+    .modal-title {
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blanco);
+      margin-bottom: 32px;
+      font-weight: 700;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 8px;
+    }
+
+    .field input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 0;
+      color: var(--blanco);
+      font-family: 'Bahnschrift', 'Arial Narrow', Arial, sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus {
+      border-color: var(--rojo);
+    }
+
+    .field input::placeholder {
+      color: rgba(255,255,255,0.2);
+    }
+
+    .error-msg {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--rojo);
+      margin-top: 6px;
+      display: none;
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 12px;
+      font-family: 'Bahnschrift', 'Arial Narrow', Arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--negro);
+      background: var(--rojo);
+      border: none;
+      padding: 14px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.85;
+    }
+
+    .modal-hint {
+      margin-top: 16px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.2);
+      text-align: center;
+    }
+
+    /* ── BLINK CURSOR decorativo ── */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--rojo);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LANDING -->
+  <div class="landing">
+    <div class="bg"></div>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
+    <div class="content">
+      <img class="logo-img" src="logo.png" alt="oir a sor — rosario al revés" />
+      <button class="btn-login" onclick="openModal()">Iniciar sesión</button>
+    </div>
+  </div>
+
+  <!-- MODAL LOGIN -->
+  <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+    <div class="modal" id="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-tag">Acceso restringido<span class="cursor"></span></div>
+      <div class="modal-title">Identificación</div>
+
+      <div class="field">
+        <label>Código de agente</label>
+        <input type="text" id="usuario" placeholder="ingresá tu código" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="off" />
+        <div class="error-msg" id="errorMsg">Credenciales inválidas. Intentá de nuevo.</div>
+      </div>
+
+      <button class="btn-submit" onclick="handleLogin()">Ingresar</button>
+      <div class="modal-hint">Solo personal autorizado</div>
+    </div>
+  </div>
+
+  <script>
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('active');
+      setTimeout(() => document.getElementById('usuario').focus(), 300);
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.getElementById('errorMsg').classList.remove('visible');
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    }
+
+    function handleLogin() {
+      const u = document.getElementById('usuario').value.trim();
+      const p = document.getElementById('password').value.trim();
+      const err = document.getElementById('errorMsg');
+
+      if (u === '' || p === '') {
+        err.textContent = 'Completá todos los campos.';
+        err.classList.add('visible');
+        return;
+      }
+
+      // login ficticio: cualquier usuario/contraseña funciona
+      err.classList.remove('visible');
+      // redirigir al mapa
+      window.location.href = 'mapa.html';
+    }
+
+    // enter para hacer login
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('active')) {
+        handleLogin();
+      }
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+
+</body>
+</html>
